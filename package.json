@@ -1,0 +1,39 @@
+{
+    "name": "WorkFlowUI",
+    "version": "1.0.0",
+    "description": "A simple CAP project.",
+    "repository": "<Add your repository here>",
+    "license": "UNLICENSED",
+    "private": true,
+    "dependencies": {
+        "@sap-cloud-sdk/http-client": "^3.11.0",
+        "@sap-cloud-sdk/resilience": "^3.11.0",
+        "@sap/cds": "^7.5.3",
+        "@sap/cds-hana": "^2",
+        "@sap/xssec": "^3.6.1",
+        "axios": "^1.6.7",
+        "express": "^4",
+        "passport": "^0.7.0"
+    },
+    "devDependencies": {
+        "@cap-js/sqlite": "^1",
+        "@sap/cds-dk": "^7",
+        "@sap/ux-specification": "^1.120.7",
+        "rimraf": "^3.0.2"
+    },
+    "scripts": {
+        "start": "cds-serve",
+        "undeploy": "cf undeploy WorkFlowUI --delete-services --delete-service-keys --delete-service-brokers",
+        "build": "rimraf resources mta_archives && mbt build --mtar archive",
+        "deploy": "cf deploy mta_archives/archive.mtar --retries 1",
+        "watch-testlist": "cds watch --open testlist/webapp/index.html?sap-ui-xx-viewCache=false"
+    },
+    "cds": {
+        "requires": {
+            "auth": "dummy"
+        }
+    },
+    "sapux": [
+        "app/testlist"
+    ]
+}

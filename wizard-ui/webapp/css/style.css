@@ -1,0 +1,236 @@
+#vobscreen2\:\:VOB_Screen2ObjectPage--fe\:\:CustomSection\:\:Vandorboard {
+    /* margin: -3% !important;
+    width: 110% !important; */
+}
+
+
+
+.sectionClass {
+    margin: unset !important;
+    padding: unset !important;
+    background: red;
+    height: 85vh !important;
+}
+
+.tableClass {
+    max-width: 40vw !important;
+    min-width: 40vw !important;
+    /* / height: 80vh !important; / */
+}
+
+.vendorClass {
+    /* / padding-left: 2px; / */
+    padding-top: 0px;
+    align-items: center;
+    /* background-color: aqua; */
+    /* / border: solid 1px black; / */
+}
+
+.ResetClass * {
+    /* / padding-top: 11px; ; / */
+    margin: unset !important;
+    padding: unset !important;
+    border-radius: unset;
+    /* / gap:3px !important; / */
+}
+
+.inpVboxClass {
+
+    padding-top: 0px;
+}
+
+.inpFieldClass * {
+    /* / align-items: end; / */
+    /* text-align: center; */
+    font-size: 16px;
+    min-width: 15vw !important;
+    pointer-events: none;
+    /* background-color: greenyellow !important;
+    border-style: ridge; */
+
+
+    /* / width: 30vw !important; / */
+
+}
+
+
+
+/* / .vboxbelowtable .sapMLabel{ /
+    / background: red; /
+    / width: 40vw; /
+    / border-bottom: solid 1px black; 
+/ } /
+ */
+
+.vendorClass .sapMCheckBox * {
+    size: 10px !important;
+    padding: unset;
+}
+
+.SupplierNameClass {
+    /* height: fit-content;  */
+}
+
+.sapMCb .sapMLabel {
+    font-weight: bolder;
+}
+
+
+.mainVboxComment {
+    gap: 20px !important;
+    overflow: scroll !important;
+    scrollbar-width: thin;
+
+}
+
+.labelcomment {
+    /* padding-top: 10px; */
+    padding-left: 10px;
+    font-weight: bolder;
+    /* width: 300px; */
+    /* font-size: larger; */
+
+}
+
+/* .buttonhistory {
+
+    padding-left: 80vw !important;
+    padding-top: -90px !important;
+} */
+
+.custColor {
+
+    background: lightblue !important;
+}
+
+.inputcss {
+    /* background-color: red !important; */
+    border-style: ridge !important;
+    /* pointer-events: none !important; */
+    opacity: 0.5;
+
+
+}
+
+.custColo1 {
+    background: rgb(199, 230, 173) !important;
+
+}
+
+.vboxbelowtable {
+    padding-top: 15px;
+    padding-right: 10px;
+    /* / display: flex; / */
+    /* gap:1.25vw !important; */
+}
+
+.vboxupper {
+    margin-top: -2px;
+    gap: 0.7vw;
+    text-align: end;
+}
+
+.innervbox1 {
+    gap: 0.6vw !important;
+    text-align: end;
+    border-left: solid;
+    padding: 5px;
+    text-align: center;
+}
+
+.innervbox2 {
+    gap: 0.59vw !important;
+    text-align: end;
+    border-left: solid;
+    padding: 5px;
+    padding-top: 10px;
+    text-align: center;
+}
+
+.innerhbox1 {
+    /* margin-top: 2px; */
+    /* display: flex; */
+    align-items: center;
+    text-align: center;
+    padding-left: 20px;
+    border: solid;
+    border-bottom: none;
+}
+
+.innerhbox2 {
+    /* margin-top: 2px; */
+    /* display: flex; */
+    align-items: center;
+    text-align: center;
+    padding-left: 20px;
+    border: solid;
+}
+
+.hboxlabel1 {
+    padding-right: 20px;
+    text-align: center;
+    align-items: center;
+}
+
+.hboxlabel2 {
+    padding-right: 60px;
+    padding-left: 30px;
+    text-align: center;
+    align-items: center;
+}
+
+.hboxcontainer {
+    margin-top: 9px;
+    padding-bottom: 10px;
+}
+
+.vendorlabel {
+    padding: 5px;
+    font-size: 15px;
+    padding-left: 80px;
+}
+
+.colClass {
+    border: solid 1px black !important;
+    /* background-color: red !important; */
+}
+
+.scrollvbox {
+    overflow-x: scroll !important;
+    scrollbar-width: thin;
+    gap: 40px !important;
+    padding-bottom: 60px !important
+}
+
+.VendorHBoxClass {
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    display: flex !important;
+}
+
+.rightVBox {
+    gap: 5px !important;
+    text-align: center !important;
+    border: solid 1px !important;
+    width: 300px !important;
+    padding-top: 5px !important;
+    padding-bottom: 20px !important;
+    padding-left: 20px !important;
+    margin-right: 10px !important;
+    flex-shrink: 0 !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    white-space: normal !important;
+}
+
+
+.tablevbox {
+    padding-top: 15px !important;
+    /* background: greenyellow; */
+}
+
+.aftertablevbox {
+    gap: 15px !important;
+    padding-top: 10px !important;
+    /* background: orange; */
+}

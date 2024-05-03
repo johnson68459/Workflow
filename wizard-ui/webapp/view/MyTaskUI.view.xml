@@ -1,0 +1,14 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="wizard.wizardui.controller.MyTaskUI" displayBlock="true">
+    <App id="app">
+        <pages>
+            <Page id="pageid" showHeader="false" showFooter="false">
+            <content>
+                <Text xmlns="sap.m" text="CustomerName" id="text3"/>
+                 <Input value="{context>/customerName}" id="__input0"/>
+                 <Label id="comment-label" text="Comment" />
+                    <TextArea id="comment-field" showExceededText="true" maxLength="1000" width="100%" height="120px" value="{context>/comment}"/>
+            </content>
+            </Page>
+        </pages>
+    </App>
+</mvc:View>

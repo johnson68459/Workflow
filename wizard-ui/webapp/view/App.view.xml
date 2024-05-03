@@ -1,0 +1,258 @@
+<mvc:View xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form" controllerName="wizard.wizardui.controller.App"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.uxap"
+    xmlns:upload="sap.m.upload"
+    xmlns:m="sap.m">
+    <m:App id="app">
+        <m:pages>
+            <m:Page id="wizardContentPage" showHeader="false">
+                <m:content>
+                    <ObjectPageLayout id="ObjectPageLayout" enableLazyLoading="true" upperCaseAnchorBar="false">
+                        <sections>
+                            <ObjectPageSection title="Section 1" titleUppercase="false">
+                                <ObjectPageSubSection title="General Information" mode="Expanded" titleUppercase="false">
+                                    <blocks>
+                                        <f:Form>
+                                            <f:layout>
+                                                <f:ColumnLayout columnsM="2" columnsL="3" columnsXL="4" />
+                                            </f:layout>
+                                            <f:FormContainer >
+
+                                                <f:FormElement label="Part System">
+                                                    <m:Text text="{oCapData>/part_system}"/>
+                                                </f:FormElement>
+
+                                                <f:FormElement label="Sector">
+                                                    <m:Text text="{oCapData>/sector}"/>
+                                                </f:FormElement>
+
+                                                <f:FormElement label="FORUM">
+                                                    <m:Text text="{oCapData>/forum}"/>
+                                                </f:FormElement>
+
+                                                <f:FormElement label="Project Code and Description">
+                                                    <m:Text text="{oCapData>/project_description} {oCapData>/project_code}"/>
+                                                </f:FormElement>
+
+                                                <f:FormElement label="Potential Suppliers">
+                                                    <m:Text text="{oCapData>/suplier}"/>
+                                                </f:FormElement>
+
+                                                <f:FormElement label="Presented On and By">
+                                                    <m:Text text="{oCapData>/presented_on_by}"/>
+                                                </f:FormElement>
+
+                                                <f:FormElement label="SOP">
+                                                    <m:Text text="{oCapData>/sop}"/>
+                                                </f:FormElement>
+
+                                                <f:FormElement label="Supplier assessment score">
+                                                    <m:Text text="{oCapData>/supplier_assessment_score}"/>
+                                                </f:FormElement>
+
+                                            </f:FormContainer>
+                                        </f:Form>
+
+                                    </blocks>
+                                </ObjectPageSubSection>
+                            </ObjectPageSection>
+                            <ObjectPageSection titleUppercase="false" title="VOB">
+                                <subSections>
+                                    <ObjectPageSubSection titleUppercase="false">
+                                        <blocks>
+                                            <m:HBox id="mainHBox">
+                                                <m:VBox>
+                                                    <m:Table id="parentTable" class="tableClass" items = "{path:'oCapData>/vob_yoy_scr4'}">
+                                                        <m:columns>
+                                                            <m:Column>
+                                                                <m:Label text="MGSP Part Nos" />
+                                                            </m:Column>
+                                                            <m:Column>
+                                                                <m:Label text="Existing MGSP PO Price" />
+                                                            </m:Column>
+                                                            <m:Column>
+                                                                <m:Label text="Target Price" />
+                                                            </m:Column>
+                                                            <m:Column>
+                                                                <m:Label text="Approve" />
+                                                            </m:Column>
+                                                        </m:columns>
+
+                                                        <m:items>
+                                                            <m:ColumnListItem>
+                                                                <m:cells>
+                                                                    <m:Text wrapping="false" text="{oCapData>MGSP_Part_Nos}" />
+                                                                    <m:Text wrapping="false" text="{oCapData>Existing_MGSP_PO_Price}" />
+                                                                    <m:Text wrapping="false" text="{oCapData>target_price}" />
+                                                                    <m:Switch customTextOn="Yes" customTextOff="No" state="{oCapData>state}" change="onLineItemChange" />
+                                                                </m:cells>
+                                                            </m:ColumnListItem>
+                                                        </m:items>
+                                                    </m:Table>
+                                                    <m:VBox alignItems='End' class="vboxbelowtable">
+                                                        <m:VBox class="vboxupper">
+                                                            <m:Label text="Total Landed Investment - Settled (Rs. lacs)" />
+                                                            <m:Label text="Total Business value (Rs. Lac) 1st 12months" />
+                                                            <m:Label text="Amount to be paid to M/s RKR (Lac) 1st 12 months" />
+                                                            <m:Label text="Amount to be paid to M/s RKR (Lac) 2nd + 3rd Year" />
+                                                            <m:Label text="YOY Reduction for 3 yrs (After SOP + 1 year)" />
+                                                            <m:Label text="FX Base Rate" />
+                                                            <m:Label text="Finished Weight of Part / System (kg)" />
+                                                            <m:Label text="DTB Packaging Cost Rs" />
+                                                            <m:Label text="Inco Terms" />
+                                                            <m:Label text="Payment Terms" />
+                                                            <m:Label text="Transport Cost" />
+                                                        </m:VBox>
+
+                                                        <m:VBox class="hboxcontainer">
+                                                            <m:HBox class="innerhbox1">
+                                                                <m:Label class="hboxlabel1" text="Capex" />
+                                                                <m:VBox class="innervbox1">
+                                                                    <m:Label text="Tooling / Dies / Moulds / Fixtures" />
+                                                                    <m:Label text="Inspection Gauges" />
+                                                                </m:VBox>
+                                                            </m:HBox>
+
+                                                            <m:HBox class="innerhbox2">
+                                                                <m:Label class="hboxlabel2" text="Revenue" />
+                                                                <m:VBox class="innervbox2">
+                                                                    <m:Label text="Testing / Validation" />
+                                                                    <m:Label text="Engg Fees" />
+                                                                    <m:Label text="Proto Tooling" />
+                                                                    <m:Label text="Logistics Trollies" />
+                                                                </m:VBox>
+                                                            </m:HBox>
+                                                        </m:VBox>
+                                                        <m:Label text="Total Landed Investment Settled" />
+                                                    </m:VBox>
+                                                </m:VBox>
+                                                <m:HBox id="righthbox" class="VendorHBoxClass" />
+                                            </m:HBox>
+                                        </blocks>
+                                    </ObjectPageSubSection>
+                                </subSections>
+                            </ObjectPageSection>
+                            <ObjectPageSection titleUppercase="false" title="Comments">
+                                <subSections>
+                                    <ObjectPageSubSection titleUppercase="false">
+                                        <actions>
+                                            <m:Button text="Comment" press="onCommentPress"></m:Button>
+                                        </actions>
+                                        <blocks>
+                                            <m:VBox class="mainVboxComment">
+                                                <m:VBox>
+                                                    <m:Label width="auto" wrapping="true" text="Team Recommendation with Rationale" class="labelcomment">
+                                                    </m:Label>
+                                                    <m:TextArea liveChange="onCommentsChange" id="comment1" value="" rows="8" width="100%"/>
+                                                </m:VBox>
+                                                <m:VBox>
+                                                    <m:Label width="auto" wrapping="true" text="Decision and MOM of Forum" class="labelcomment">
+                                                    </m:Label>
+                                                    <m:TextArea liveChange="onCommentsChange" id="comment2" value="" rows="8" width="100%"/>
+                                                </m:VBox>
+                                                <m:VBox>
+                                                    <m:Label width="auto" wrapping="true" text="Development Supply Agreement Whether Signed ? (If no- LoBA will share after DSA agreement.)" class="labelcomment">
+                                                    </m:Label>
+                                                    <m:TextArea liveChange="onCommentsChange" id="comment3" value="" rows="8" width="100%"/>
+                                                </m:VBox>
+                                                <m:VBox>
+                                                    <m:Label width="auto" wrapping="true" text="Tooling Agreement signed? (If applicable)" class="labelcomment">
+                                                    </m:Label>
+                                                    <m:TextArea liveChange="onCommentsChange" id="comment4" value="" rows="8" width="100%"/>
+                                                </m:VBox>
+                                                <m:VBox>
+                                                    <m:Label width="auto" wrapping="true" text="Supplier Code of Conduct declaration if submitted ?" class="labelcomment">
+                                                    </m:Label>
+                                                    <m:TextArea liveChange="onCommentsChange" id="comment5" value="" rows="8" width="100%"/>
+                                                </m:VBox>
+
+
+                                            </m:VBox>
+
+
+                                        </blocks>
+                                    </ObjectPageSubSection>
+                                </subSections>
+                            </ObjectPageSection>
+                            <ObjectPageSection titleUppercase="false" title="Attachments">
+                                <ObjectPageSubSection >
+                                    <actions>
+                                        <m:Button text="UploadFile" press="onFileLoaderPressed"></m:Button>
+                                    </actions>
+                                    <blocks>
+                                        <upload:UploadSet id="uploadSet" instantUpload="false" uploadEnabled="false" showIcons="true" items="{path: 'oCapData>/vob_files',templateShareable: false}">
+                                            <upload:items>
+                                                <upload:UploadSetItem openPressed="onFilePressed" visibleEdit="false" visibleRemove="false" enabledRemove="false" enabledEdit="false" url="{oCapData>url}" fileName="{oCapData>fileName}" mediaType="{oCapData>mediaType}" />
+                                                <!-- <upload:UploadSetItem openPressed="onOpenPressed" enabledRemove="false" enabledEdit="false" fileName="{fileName}" mediaType="{mediaType}" url="{url}"></upload:UploadSetItem> -->
+                                            </upload:items>
+                                        </upload:UploadSet>
+                                    </blocks>
+                                </ObjectPageSubSection>
+                            </ObjectPageSection>
+                            <ObjectPageSection visible="true" titleUppercase="false" title="Workflow History">
+                                <subSections>
+                                    <ObjectPageSubSection titleUppercase="false">
+                                        <blocks>
+                                            <m:VBox id="v1">
+                                                <m:HBox id="buttonContainer" alignItems="End" justifyContent="End" width="100%" />
+
+                                                <m:Title text="Level1" id="title1" />
+                                                <!-- <m:Button core:require="{ handler: 'headscm2/ext/fragment/Worflow_History'}" text="Workflow History" press="handler.onPress" id="b1" visible="false"/> -->
+                                                <m:ScrollContainer id="scrollContainer" height="140px" width="100%">
+                                                    <m:Table id="table">
+                                                        <m:columns>
+                                                            <m:Column width="11rem" id="c022" styleClass="colClass">
+                                                                <m:Text text="Level" id="dem" />
+                                                            </m:Column>
+                                                            <m:Column width="11rem" id="c22" styleClass="colClass">
+                                                                <m:Text text="Title" id="demo" />
+                                                            </m:Column>
+                                                            <m:Column id="c1" width="11rem" styleClass="colClass">
+                                                                <m:Text text="Employee ID" id="t1" />
+                                                            </m:Column>
+                                                            <m:Column id="c2" width="11rem" styleClass="colClass">
+                                                                <m:Text text="Employee Name" id="t2" width="11rem" />
+                                                            </m:Column>
+                                                            <m:Column id="c3" width="11rem" styleClass="colClass">
+                                                                <m:Text text="Begin Date" id="t3" width="11rem" />
+                                                            </m:Column>
+                                                            <m:Column id="c4" width="11rem" styleClass="colClass">
+                                                                <m:Text text="End Date" id="t4" />
+                                                            </m:Column>
+                                                            <m:Column id="c5" width="11rem" styleClass="colClass">
+                                                                <m:Text text="Days Taken" id="t5" />
+                                                            </m:Column>
+                                                            <m:Column id="c6" width="11rem" styleClass="colClass">
+                                                                <m:Text text="Approved By" id="t06" />
+                                                            </m:Column>
+                                                        </m:columns>
+                                                        <m:items>
+                                                            <m:ColumnListItem id="cli1">
+                                                                <m:cells>
+                                                                    <m:Text text="Level1" id="t14" />
+                                                                    <m:Text text="Title1" id="t6" />
+                                                                    <m:Text text="Emp01" id="t7" />
+                                                                    <m:Text text="Demo" id="t8" />
+                                                                    <m:Text text="08-03-24" id="t9" />
+                                                                    <m:Text text="10-03-24" id="t11" />
+                                                                    <m:Text text="2" id="t12" />
+                                                                    <m:Text text="Approver" id="t13" />
+                                                                </m:cells>
+                                                            </m:ColumnListItem>
+                                                        </m:items>
+                                                    </m:Table>
+                                                </m:ScrollContainer>
+                                            </m:VBox>
+                                        </blocks>
+                                    </ObjectPageSubSection>
+                                </subSections>
+                            </ObjectPageSection>
+                        </sections>
+                    </ObjectPageLayout>
+                </m:content>
+            </m:Page>
+        </m:pages>
+    </m:App>
+</mvc:View>
