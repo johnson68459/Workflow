@@ -9,109 +9,78 @@ sap.ui.define(
     };
     var yoyLineItem = {};
     var files = {};
+    var oData;
+    // var mainServiceUrl = "https://2890861ctrial-dev-mahindravob-srv.cfapps.us10-001.hana.ondemand.com";
+    var mainServiceUrl = `https://3ebeb48ctrial-dev-mahindra-srv.cfapps.us10-001.hana.ondemand.com`;
     return BaseController.extend("wizard.wizardui.controller.App", {
       async onInit() {
 
         await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // const requestOptions = {
-        //   method: "GET",
-        //   redirect: "follow"
-        // };
-
-        // fetch("https://reqres.in/api/users?page=2", requestOptions)
-        //   .then((response) => response.text())
-        //   .then((result) => console.log(result))
-        //   .catch((error) => console.error(error));
-
-        await $.ajax({
-          url: 'https://2890861ctrial-dev-mahindravob-srv.cfapps.us10-001.hana.ondemand.com/odata/v4/my/VOB_Screen4',
-          method: 'GET',
-          success: function (response) {
-            debugger
-            console.log('Success:', response);
-            // Handle successful response here
-          },
-          error: function (xhr, status, error) {
-            debugger
-            console.error('Error:', error);
-            // Handle error here
-          }
-        });
-
-
         try {
-          commentsval = {
-            "approvalflow": "true"
-          };
-          // let userinfo = new sap.ushell.services.UserInfo().getEmail();
-          // commentsval = JSON.parse(commentsval);
-          if (new sap.ushell.services.UserInfo().getEmail() && !commentsval.hasOwnProperty("app_rej_by")) {
-            commentsval["app_rej_by"] = `${new sap.ushell.services.UserInfo().getEmail()}`;
-          }
-          else {
-            commentsval["app_rej_by"] = 'bpa Inbox user';
-          }
-
-          var oData = this.getOwnerComponent().oModels.context.oData.raw_data[0];
-          var oModel = new sap.ui.model.json.JSONModel();
-          oModel.setData(oData);
-          this.getView().setModel(oModel, "oCapData");
-          this.byId("uploadSet").setMode("None")
-
-          ////////////////////////////////////////////////////////////////////
-
-          commentsval = JSON.stringify(commentsval);
-
-          this.getView().getModel("context").setProperty("/comment", commentsval);
-
-        } catch (error) {
-          console.log("ERROR:", error)
-        }
-        debugger
+          if (!oData) {
+            var vobid = this.getOwnerComponent().oModels.context.oData.vobid
+            await $.ajax({
+              url: `${mainServiceUrl}/odata/v4/my/VOB_Screen4?$filter=id eq ${vobid}&$expand=vob_yoy_scr4,vob_suplier4($expand=*),vob_comments,vob_files,vob_to_Workflow_History`,
+              method: 'GET',
+              success: function (response) {
+                debugger
+                oData = response.value[0]
+                console.log('Success:', response);
+                // Handle successful response here
+              },
+              error: function (xhr, status, error) {
+                debugger
+                console.error('Error:', error);
+                // Handle error here
+              }
+            });
 
 
-      },
-      onBeforeRendering: async function (oEvent) {
-
-        // if (!this.getView().getModel("oCapData")) {
-        //   var oData = this.getOwnerComponent().oModels.context.oData.raw_data[0].vob_files;
-        //   var oModel = new sap.ui.model.json.JSONModel();
-        //   oModel.setData(oData);
-        //   this.getView().setModel(oModel, "oCapData");
-        // }
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        this.byId("uploadSet").setUploadButtonInvisible(true);
-        files = {};
-        debugger
-        try {
-          if (typeof (commentsval) != 'string') {
-            commentsval = {
-              "approvalflow": "true"
-            };
-            if (new sap.ushell.services.UserInfo().getEmail() && !commentsval.hasOwnProperty("app_rej_by")) {
-              commentsval["app_rej_by"] = `${new sap.ushell.services.UserInfo().getEmail()}`;
-            }
-            else {
-              commentsval["app_rej_by"] = 'bpa Inbox user';
-            }
-            commentsval = JSON.stringify(commentsval);
-          }
-
-
-
-          this.getView().getModel("context").setProperty("/comment", commentsval);
-
-          if (!this.getView().getModel("oCapData")) {
-            var oData = this.getOwnerComponent().oModels.context.oData.raw_data[0].vob_files;
             var oModel = new sap.ui.model.json.JSONModel();
             oModel.setData(oData);
             this.getView().setModel(oModel, "oCapData");
+            this.byId("uploadSet").setMode("None");
+            // this.byId("uploadSet").setUploadButtonInvisible(true);
+
+          }
+        } catch (error) {
+          console.log("ERROR:", error)
+        }
+
+      },
+      onBeforeRendering: async function (oEvent) {
+        debugger
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        try {
+          if (!this.getView().getModel("oCapData")) {
+            var vobid = this.getOwnerComponent().oModels.context.oData.vobid
+            await $.ajax({
+              url: `${mainServiceUrl}/odata/v4/my/VOB_Screen4?$filter=id eq ${vobid}&$expand=vob_yoy_scr4,vob_suplier4($expand=*),vob_comments,vob_files,vob_to_Workflow_History`,
+              method: 'GET',
+              success: function (response) {
+                debugger
+                oData = response.value[0]
+                console.log('Success:', response);
+                // Handle successful response here
+              },
+              error: function (xhr, status, error) {
+                debugger
+                console.error('Error:', error);
+                // Handle error here
+              }
+            });
+
+
+            var oModel = new sap.ui.model.json.JSONModel();
+            oModel.setData(oData);
+            this.getView().setModel(oModel, "oCapData");
+            this.byId("uploadSet").setMode("None");
+            // this.byId("uploadSet").setUploadButtonInvisible(true);
+
           }
 
-          const vob_yoy_scr4 = this.getOwnerComponent().oModels.context.oData.raw_data[0].vob_yoy_scr4;
-          var vob_suplier4 = this.getOwnerComponent().oModels.context.oData.raw_data[0].vob_suplier4;
+          const vob_yoy_scr4 = oData.vob_yoy_scr4;
+          var vob_suplier4 = oData.vob_suplier4;
 
           var mainHBox = this.byId("righthbox");
           mainHBox.destroyItems();
@@ -188,220 +157,231 @@ sap.ui.define(
             }
             rightVbox.addItem(tablevbox);
             rightVbox.addItem(aftertablevbox);
-            // if (this.byId("mainHBox").getItems()[1]) {
-            //   this.byId("mainHBox").removeItem(this.byId("mainHBox").getItems()[1]);
-            // }
+
 
             mainHBox.addItem(rightVbox);
           }
 
 
-          // var filesData = this.getOwnerComponent().oModels.context.oData.raw_data[0].vob_files;
-          // var uploadSet = this.byId("uploadSet");
-          // uploadSet.destroyItems();
-
-
-          // for (let i = 0; i < filesData.length; i++) {
-          //   uploadSet.addItem(new sap.m.upload.UploadSetItem({
-          //     visibleEdit: false,
-          //     visibleRemove: false,
-          //     enabledRemove: false,
-          //     enabledEdit: false,
-          //     url: "oCapData>url}",
-          //     fileName: `${filesData[i].fileName}`,
-          //     mediaType: `${filesData[i].mediaType}`,
-          //     openPressed: function (oEvent) {
-          //       debugger
-          //       oEvent.preventDefault();
-          //       // var currData = oEvent.getSource().getBindingContext("oCapData").getObject();
-          //     }
-          //   }))
-
-          // }
-
-
         } catch (error) {
-          console.log('Error:', error);
+          console.log("ERROR:", error)
         }
-
-
-
       },
       onAfterRendering: async function (oEvent) {
         debugger
         await new Promise(resolve => setTimeout(resolve, 1000));
-        // const delay = () => new Promise(resolve => setTimeout(resolve, 3000));
-        // await delay();
+        try {
 
 
-        if (typeof (commentsval) != 'string') {
+          if (!this.getView().getModel("oCapData")) {
+            var vobid = this.getOwnerComponent().oModels.context.oData.vobid
+            await $.ajax({
+              url: `${mainServiceUrl}/odata/v4/my/VOB_Screen4?$filter=id eq ${vobid}&$expand=vob_yoy_scr4,vob_suplier4($expand=*),vob_comments,vob_files,vob_to_Workflow_History`,
+              method: 'GET',
+              success: function (response) {
+                debugger
+                oData = response.value[0]
+                console.log('Success:', response);
+                // Handle successful response here
+              },
+              error: function (xhr, status, error) {
+                debugger
+                console.error('Error:', error);
+                // Handle error here
+              }
+            });
 
-          commentsval = JSON.stringify(commentsval);
 
-          this.getView().getModel("context").setProperty("/comment", commentsval);
-        }
+            var oModel = new sap.ui.model.json.JSONModel();
+            oModel.setData(oData);
+            this.getView().setModel(oModel, "oCapData");
+            this.byId("uploadSet").setMode("None");
+            // this.byId("uploadSet").setUploadButtonInvisible(true);
 
-        //
-        var workflowhistoryarray = this.getOwnerComponent().oModels.context.oData.raw_data[0].vob_to_Workflow_History;
-        var vBox = this.byId("v1");
-        vBox.destroyItems();
-        var groupedData = {};
-        vBox.addStyleClass("scrollvbox");
-
-        workflowhistoryarray.sort(function (a, b) {
-          var levelA = parseFloat(a.level);
-          var levelB = parseFloat(b.level);
-
-          if (levelA < levelB) {
-            return -1;
-          } else if (levelA > levelB) {
-            return 1;
-          } else {
-            return 0;
           }
-        });
 
-        //grouping based on level
-        workflowhistoryarray.forEach(function (item) {
-          if (!groupedData[item.level]) {
-            groupedData[item.level] = [];
-          }
-          groupedData[item.level].push(item);
-        });
+          var workflowhistoryarray = oData.vob_to_Workflow_History;
+          var vBox = this.byId("v1");
+          vBox.destroyItems();
+          var groupedData = {};
+          vBox.addStyleClass("scrollvbox");
 
+          workflowhistoryarray.sort(function (a, b) {
+            var levelA = parseFloat(a.level);
+            var levelB = parseFloat(b.level);
 
-        Object.keys(groupedData).forEach(function (level) {
-          var levelData = groupedData[level];
-
-          // Create a VBox for each level
-          var oVBox = new sap.m.VBox();
-
-          var parsedLevel = parseInt(level)
-          // Set the title dynamically
-          var oTitle = new sap.m.Title({ text: "Level " + parsedLevel });
-          oVBox.addItem(oTitle);
-
-          // Create a ScrollContainer
-          // var oScrollContainer = new sap.m.ScrollContainer({
-          // 	height: "100%",
-          // 	width: "100%"
-          // });
-
-          // Create a Table
-          var oTable = new sap.m.Table({
-            fixedLayout: false,
-            width: "110vw"
+            if (levelA < levelB) {
+              return -1;
+            } else if (levelA > levelB) {
+              return 1;
+            } else {
+              return 0;
+            }
           });
-          oTable.addStyleClass("tableWithBorder");
+
+          //grouping based on level
+          workflowhistoryarray.forEach(function (item) {
+            if (!groupedData[item.level]) {
+              groupedData[item.level] = [];
+            }
+            groupedData[item.level].push(item);
+          });
 
 
-          // Define Table columns dynamically based on the first data item
-          var firstItem = levelData[0];
-          // Object.keys(firstItem).forEach(function(key) {
-          //   var oColumn = new sap.m.Column({ header: new sap.m.Text({ text: key }) });
-          // //   oColumn.addStyleClass("colClass")
-          //   oTable.addColumn(oColumn);
-          // });
-          var oColumn1 = new sap.m.Column({ header: new sap.m.Text({ text: "Level" }), styleClass: "colClass" })
-          var oColumn2 = new sap.m.Column({ header: new sap.m.Text({ text: "Title" }), styleClass: "colClass" });
-          var oColumn3 = new sap.m.Column({ header: new sap.m.Text({ text: "Employee ID" }), styleClass: "colClass" });
-          var oColumn9 = new sap.m.Column({ header: new sap.m.Text({ text: "Employee Name" }), styleClass: "colClass" });
-          var oColumn4 = new sap.m.Column({ header: new sap.m.Text({ text: "Status" }), styleClass: "colClass" });
-          var oColumn5 = new sap.m.Column({ header: new sap.m.Text({ text: "Begin Date" }), styleClass: "colClass" });
-          var oColumn6 = new sap.m.Column({ header: new sap.m.Text({ text: "End Date" }), styleClass: "colClass" });
-          var oColumn7 = new sap.m.Column({ header: new sap.m.Text({ text: "Days Taken" }), styleClass: "colClass" });
-          var oColumn8 = new sap.m.Column({ header: new sap.m.Text({ text: "Action Taken By" }), styleClass: "colClass" });
-          oTable.addColumn(oColumn1);
-          oTable.addColumn(oColumn2);
-          oTable.addColumn(oColumn3);
-          oTable.addColumn(oColumn9);
-          oTable.addColumn(oColumn4);
-          oTable.addColumn(oColumn5);
-          oTable.addColumn(oColumn6);
-          oTable.addColumn(oColumn7);
-          oTable.addColumn(oColumn8);
+          Object.keys(groupedData).forEach(function (level) {
+            var levelData = groupedData[level];
 
-          // Iterate over the data for this level and add table rows
-          levelData.forEach(function (item) {
-            var oRow = new sap.m.ColumnListItem();
-            oRow.addCell(new sap.m.Text({ text: `${parseInt(item.level)}` }));
-            oRow.addCell(new sap.m.Text({ text: item.title }));
-            oRow.addCell(new sap.m.Text({ text: item.employee_id }));
-            oRow.addCell(new sap.m.Text({ text: item.employee_Name }));
-            oRow.addCell(new sap.m.Text({ text: item.status }));
-            oRow.addCell(new sap.m.Text({ text: item.begin_Date_Time }));
-            oRow.addCell(new sap.m.Text({ text: item.end_Date_Time }));
-            oRow.addCell(new sap.m.Text({ text: item.days_Taken }));
-            oRow.addCell(new sap.m.Text({ text: item.approved_By }));
+            // Create a VBox for each level
+            var oVBox = new sap.m.VBox();
 
-            // Object.keys(item).forEach(function (key) {
-            // 	oRow.addCell(new sap.m.Text({ text: item[key] }));
+            var parsedLevel = parseInt(level)
+            // Set the title dynamically
+            var oTitle = new sap.m.Title({ text: "Level " + parsedLevel });
+            oVBox.addItem(oTitle);
+
+            // Create a ScrollContainer
+            // var oScrollContainer = new sap.m.ScrollContainer({
+            // 	height: "100%",
+            // 	width: "100%"
             // });
-            oTable.addItem(oRow);
+
+            // Create a Table
+            var oTable = new sap.m.Table({
+              fixedLayout: false,
+              width: "110vw"
+            });
+            oTable.addStyleClass("tableWithBorder");
+
+
+            // Define Table columns dynamically based on the first data item
+            var firstItem = levelData[0];
+            // Object.keys(firstItem).forEach(function(key) {
+            //   var oColumn = new sap.m.Column({ header: new sap.m.Text({ text: key }) });
+            // //   oColumn.addStyleClass("colClass")
+            //   oTable.addColumn(oColumn);
+            // });
+            var oColumn1 = new sap.m.Column({ header: new sap.m.Text({ text: "Level" }), styleClass: "colClass" })
+            var oColumn2 = new sap.m.Column({ header: new sap.m.Text({ text: "Title" }), styleClass: "colClass" });
+            var oColumn3 = new sap.m.Column({ header: new sap.m.Text({ text: "Employee ID" }), styleClass: "colClass" });
+            var oColumn9 = new sap.m.Column({ header: new sap.m.Text({ text: "Employee Name" }), styleClass: "colClass" });
+            var oColumn4 = new sap.m.Column({ header: new sap.m.Text({ text: "Status" }), styleClass: "colClass" });
+            var oColumn5 = new sap.m.Column({ header: new sap.m.Text({ text: "Begin Date" }), styleClass: "colClass" });
+            var oColumn6 = new sap.m.Column({ header: new sap.m.Text({ text: "End Date" }), styleClass: "colClass" });
+            var oColumn7 = new sap.m.Column({ header: new sap.m.Text({ text: "Days Taken" }), styleClass: "colClass" });
+            var oColumn8 = new sap.m.Column({ header: new sap.m.Text({ text: "Action Taken By" }), styleClass: "colClass" });
+            oTable.addColumn(oColumn1);
+            oTable.addColumn(oColumn2);
+            oTable.addColumn(oColumn3);
+            oTable.addColumn(oColumn9);
+            oTable.addColumn(oColumn4);
+            oTable.addColumn(oColumn5);
+            oTable.addColumn(oColumn6);
+            oTable.addColumn(oColumn7);
+            oTable.addColumn(oColumn8);
+
+            // Iterate over the data for this level and add table rows
+            levelData.forEach(function (item) {
+              var oRow = new sap.m.ColumnListItem();
+              oRow.addCell(new sap.m.Text({ text: `${parseInt(item.level)}` }));
+              oRow.addCell(new sap.m.Text({ text: item.title }));
+              oRow.addCell(new sap.m.Text({ text: item.employee_id }));
+              oRow.addCell(new sap.m.Text({ text: item.employee_Name }));
+              oRow.addCell(new sap.m.Text({ text: item.status }));
+              oRow.addCell(new sap.m.Text({ text: item.begin_Date_Time }));
+              oRow.addCell(new sap.m.Text({ text: item.end_Date_Time }));
+              oRow.addCell(new sap.m.Text({ text: item.days_Taken }));
+              oRow.addCell(new sap.m.Text({ text: item.approved_By }));
+
+              // Object.keys(item).forEach(function (key) {
+              // 	oRow.addCell(new sap.m.Text({ text: item[key] }));
+              // });
+              oTable.addItem(oRow);
+            });
+
+            // Add the Table to the ScrollContainer
+            // oScrollContainer.addContent(oTable);
+
+            // Add the ScrollContainer to the VBox
+            oVBox.addItem(oTable);
+
+            // Add the VBox to the main VBox container
+            vBox.addItem(oVBox);
           });
-
-          // Add the Table to the ScrollContainer
-          // oScrollContainer.addContent(oTable);
-
-          // Add the ScrollContainer to the VBox
-          oVBox.addItem(oTable);
-
-          // Add the VBox to the main VBox container
-          vBox.addItem(oVBox);
-        });
-
-        ////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
+        } catch (error) {
+          console.log(error);
+        }
 
 
       },
       onFilePressed: function (oEvent) {
         debugger
-        oEvent.preventDefault();
-        var currData = oEvent.getSource().getBindingContext("oCapData").getObject();
+        // oEvent.preventDefault();
+        // var currData = oEvent.getSource().getBindingContext("oCapData").getObject();
 
-        var base64String = currData.contentString;
-        var contentType = currData.mediaType;
+        // var base64String = currData.contentString;
+        // var contentType = currData.mediaType;
 
-        var newWindow = window.open();
-        newWindow.document.write('<iframe width="100%" height="100%" src="data:' + contentType + ';base64,' + base64String + '"></iframe>');
+        // var newWindow = window.open();
+        // newWindow.document.write('<iframe width="100%" height="100%" src="data:' + contentType + ';base64,' + base64String + '"></iframe>');
 
 
 
       },
       onLineItemChange: function (oEvent) {
-        debugger
-        if (typeof (yoyLineItem) == 'string') {
-          yoyLineItem = JSON.parse(yoyLineItem);
-        }
-        var yoydata = oEvent.getSource().getParent().getBindingContext("oCapData").getObject();
-        yoyLineItem[`${yoydata.id}`] = `${yoydata.state}`
-        yoyLineItem = JSON.stringify(yoyLineItem);
+        var oModel = this.getView().getModel("oCapData");
+        var oSwitch = oEvent.getSource();
+        var bState = oSwitch.getState();
 
-        this.getView().getModel("context").setProperty("/yoy_lineitem", yoyLineItem);
+        // Update the model data directly without triggering the change event again
+        oModel.setProperty(oSwitch.getBindingContext("oCapData").getPath() + "/state", bState);
 
-      },
-      stringToBoolean: function (sValue) {
-        debugger
-        if (sValue == 'Approved') {
-          return true;
-        }
-        else {
+        const isAtLeastOneSwitchTrue = function () {
+          debugger
+          var aItems = oModel.getProperty("/vob_yoy_scr4");
+
+          for (var i = 0; i < aItems.length; i++) {
+            if (aItems[i].state) {
+              return true;
+            }
+          }
+
           return false;
+        };
+
+        var bAtLeastOneSwitchTrue = isAtLeastOneSwitchTrue();
+        if (!bAtLeastOneSwitchTrue) {
+          // Reverse the state change if at least one switch is not true
+          oSwitch.setState(!bState);
+
+          // Show message toast
+          sap.m.MessageToast.show("At least one item should be Approved");
+        } else {
+          // Your logic when at least one switch is true
+          // For example, updating another model
+          var yoyLineItem = this.getView().getModel("device").getProperty("/yoy_lineitem");
+          var yoydata = oSwitch.getBindingContext("oCapData").getObject();
+          yoyLineItem[yoydata.id] = yoydata.state;
+          this.getView().getModel("device").setProperty("/yoy_lineitem", JSON.stringify(yoyLineItem));
         }
       },
+
       onCommentsChange: function (oEvent) {
-        debugger
+        debugger;
         let sid = oEvent.mParameters.id;
         let currValue = oEvent.mParameters.value;
-        if (typeof (commentsval) == 'string') {
+        let deviceModel = this.getView().getModel("device");
+        let commentsval = deviceModel.getProperty("/commentsval"); // Get the commentsval from device model
+
+        if (!commentsval) {
+          // If commentsval does not exist, create it as an empty object
+          commentsval = {
+            'app_rej_by': new sap.ushell.services.UserInfo().getEmail()
+          };
+        } else {
+          // If commentsval exists but as a string, parse it into an object
           commentsval = JSON.parse(commentsval);
         }
+
         if (sid.includes('App--comment1')) {
           commentsval['Team Recommendation with Rationale'] = currValue;
         }
@@ -418,34 +398,8 @@ sap.ui.define(
           commentsval['Supplier Code of Conduct declaration if submitted ?'] = currValue;
         }
 
-        commentsval = JSON.stringify(commentsval);
-
-        this.getView().getModel("context").setProperty("/comment", commentsval);
-
-      },
-      onOpenPressed: function (oEvent) {
-        debugger
-        // Get the array of vob_files from your model
-
-        window.open('https://3ebeb48ctrial-dev-mahindra-srv.cfapps.us10-001.hana.ondemand.com/odata/v4/my/Files(13199331-c67c-4026-86cb-0ff103adb95c)/content')
-        // var vobFiles = this.getOwnerComponent().oModels.context.oData.raw_data[0].vob_files;
-
-        // // Loop through each file
-        // vobFiles.forEach(function (file) {
-        //   // Get the blob content of the current file
-        //   var blobContent = file / content;
-
-        //   // Create a Blob object from the blob content with MIME type 'application/pdf'
-        //   var blob = new Blob([blobContent], { type: 'application/pdf' });
-
-        //   // Create a URL for the Blob
-        //   var blobUrl = URL.createObjectURL(blob);
-
-        //   // Open the Blob URL in a new browser window
-        //   window.open(blobUrl);
-        // });
-
-
+        // Convert commentsval back to string before setting it in the model
+        deviceModel.setProperty("/commentsval", JSON.stringify(commentsval));
       },
       onCommentPress: function (oEvent) {
         debugger
@@ -481,7 +435,7 @@ sap.ui.define(
         }
         debugger
 
-        var comments = this.getOwnerComponent().oModels.context.oData.raw_data[0].vob_comments;
+        var comments = oData.vob_comments;
         if (comments.length) {
           comments.forEach(function (entry) {
             var oTimelineItem = new sap.suite.ui.commons.TimelineItem(("thisuniqid1" + generateUniqueId()), {
@@ -653,6 +607,92 @@ sap.ui.define(
 
         this.oDefaultDialog.open();
       },
+      onAfterItemAdded: async function (oEvent) {
+        debugger
+        var item = oEvent.getParameter("item");
+        var vobid = this.getView().getModel("context").getData().vobid
+        var _createEntity = function (item) {
+          var data = {
+            mediaType: item.getMediaType(),
+            fileName: item.getFileName(),
+            // size: item.getFileObject().size,
+            vob_id: vobid,
+          };
+
+          var settings = {
+            url: `${mainServiceUrl}/odata/v4/my/Files`,
+            method: "POST",
+            headers: {
+              "Content-type": "application/json"
+            },
+            data: JSON.stringify(data)
+          };
+
+          return new Promise(async (resolve, reject) => {
+            await $.ajax(settings)
+              .done((results, textStatus, request) => {
+                debugger
+                resolve(results.ID);
+              })
+              .fail((err) => {
+                debugger
+                reject(err);
+              })
+          });
+
+        }
+
+        _createEntity(item).then(async (id) => {
+          debugger
+          var url = `${mainServiceUrl}/odata/v4/my/Files(ID=${id})/content`;
+          item.setUploadUrl(url);
+          item.setUrl(url);
+          item.setVisibleEdit(false);
+          item.attachOpenPressed((oEvent) => {
+            debugger
+          })
+          item.attachRemovePressed((oEvent) => {
+            debugger
+          })
+          await $.ajax({
+            url: `${mainServiceUrl}/odata/v4/my/Files(ID=${id})`,
+            method: 'PATCH',
+            contentType: 'application/json',
+            data: JSON.stringify({
+              url: url
+            }),
+            success: function (response) {
+              debugger
+              // oData = response.value[0]
+              console.log('Success:', response);
+              // Handle successful response here
+            },
+            error: function (xhr, status, error) {
+              debugger
+              console.error('Error:', error);
+            }
+          })
+          var oUploadSet = this.byId("uploadSet");
+          oUploadSet.setHttpRequestMethod("PUT");
+          oUploadSet.uploadItem(item);
+
+        }).catch((err) => {
+          debugger
+          console.log(err);
+        })
+
+      },
+      onUploadCompleted: async function (oEvent) {
+        debugger
+
+
+        var oUploadSet = this.byId("uploadSet");
+        oUploadSet.removeAllIncompleteItems();
+        oUploadSet.getBinding("items").refresh();
+      },
+      onRemovePressed: async function (oEvent) {
+        debugger
+      }
     });
   }
 );

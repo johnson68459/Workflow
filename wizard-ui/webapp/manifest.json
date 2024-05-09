@@ -83,7 +83,7 @@
             ]
         },
         "routing": {
-            "config": { 
+            "config": {
                 "routerClass": "sap.m.routing.Router",
                 "viewType": "XML",
                 "async": true,
@@ -140,10 +140,23 @@
             "type": "object",
             "required": [],
             "properties": {
-                "raw_data": {
-                    "type": "array",
-                    "title": "raw_data"
+                "vobid": {
+                    "type": "string",
+                    "title": "vobid"
+                },
+                "baseurl": {
+                    "type": "string",
+                    "title": "baseurl"
+                },
+                "currlevel": {
+                    "type": "string",
+                    "title": "currlevel"
+                },
+                "users": {
+                    "type": "string",
+                    "title": "users"
                 }
+                
             }
         },
         "outputs": {
@@ -152,22 +165,13 @@
             "type": "object",
             "required": [],
             "properties": {
-                "comment": {
+                "levelvalue": {
                     "type": "string",
-                    "title": "Comment",
-                    "description": "Comment to buyer"
+                    "title": "levelvalue"
                 },
-                "yoy_lineitem": {
+                "nextusers": {
                     "type": "string",
-                    "title": "Approved_line_item"
-                },
-                "action_status": {
-                    "type": "string",
-                    "title": "action_status"
-                },
-                "filesData": {
-                    "type": "array",
-                    "title": "filesData"
+                    "title": "nextusers"
                 }
             }
         },

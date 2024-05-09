@@ -182,9 +182,9 @@
                                         <m:Button text="UploadFile" press="onFileLoaderPressed"></m:Button>
                                     </actions>
                                     <blocks>
-                                        <upload:UploadSet id="uploadSet" instantUpload="false" uploadEnabled="false" showIcons="true" items="{path: 'oCapData>/vob_files',templateShareable: false}">
+                                        <upload:UploadSet id="uploadSet" instantUpload="false" uploadEnabled="true" afterItemAdded="onAfterItemAdded" uploadCompleted="onUploadCompleted" showIcons="true" items="{path: 'oCapData>/vob_files',templateShareable: false}">
                                             <upload:items>
-                                                <upload:UploadSetItem openPressed="onFilePressed" visibleEdit="false" visibleRemove="false" enabledRemove="false" enabledEdit="false" url="{oCapData>url}" fileName="{oCapData>fileName}" mediaType="{oCapData>mediaType}" />
+                                                <upload:UploadSetItem removePressed="onRemovePressed" openPressed="onFilePressed" visibleEdit="false" visibleRemove="false" enabledRemove="false" enabledEdit="false" url="{oCapData>url}" fileName="{oCapData>fileName}" mediaType="{oCapData>mediaType}" />
                                                 <!-- <upload:UploadSetItem openPressed="onOpenPressed" enabledRemove="false" enabledEdit="false" fileName="{fileName}" mediaType="{mediaType}" url="{url}"></upload:UploadSetItem> -->
                                             </upload:items>
                                         </upload:UploadSet>

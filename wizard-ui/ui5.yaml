@@ -15,9 +15,6 @@ server:
             - /resources
             - /test-resources
           url: https://ui5.sap.com
-        backend:
-          - path: /odata/v4/my/VOB_Screen4
-            destination: externalcapapi
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:
