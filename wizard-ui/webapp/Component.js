@@ -86,13 +86,14 @@ sap.ui.define(
 
                 if (entry.length) {
                   var commentPatchBody = {
-                    "IsActiveEntity": true,
+                    // "IsActiveEntity": true,
                     "vob_comments": finalcommetns
                   }
                   console.log("Inside comment insert statement");
 
                   await $.ajax({
-                    url: `${mainServiceUrl}/odata/v4/my/VOB_Screen4(id=${vobid},IsActiveEntity=true)`,
+                    // url: `${mainServiceUrl}/odata/v4/my/VOB_Screen4(id=${vobid},IsActiveEntity=true)`,
+                    url: `${mainServiceUrl}/odata/v4/my/VOB_Screen4(${vobid})`,
                     method: 'PATCH',
                     contentType: 'application/json',
                     data: JSON.stringify(commentPatchBody),
@@ -202,13 +203,14 @@ sap.ui.define(
 
                 if (entry.length) {
                   var commentPatchBody = {
-                    "IsActiveEntity": true,
+                    // "IsActiveEntity": true,
                     "vob_comments": finalcommetns
                   }
                   console.log("Inside comment insert statement");
 
                   await $.ajax({
-                    url: `${mainServiceUrl}/odata/v4/my/VOB_Screen4(id=${vobid},IsActiveEntity=true)`,
+                    // url: `${mainServiceUrl}/odata/v4/my/VOB_Screen4(id=${vobid},IsActiveEntity=true)`,
+                    url: `${mainServiceUrl}/odata/v4/my/VOB_Screen4(${vobid})`,
                     method: 'PATCH',
                     contentType: 'application/json',
                     data: JSON.stringify(commentPatchBody),

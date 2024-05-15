@@ -33,11 +33,11 @@
                                                 </f:FormElement>
 
                                                 <f:FormElement label="Project Code and Description">
-                                                    <m:Text text="{oCapData>/project_description} {oCapData>/project_code}"/>
+                                                    <m:Text text="{oCapData>/project_code} {oCapData>/project_description}"/>
                                                 </f:FormElement>
 
                                                 <f:FormElement label="Potential Suppliers">
-                                                    <m:Text text="{oCapData>/suplier}"/>
+                                                    <m:Text text="{oCapData>/potential_suppliers}"/>
                                                 </f:FormElement>
 
                                                 <f:FormElement label="Presented On and By">
@@ -138,7 +138,7 @@
                                 <subSections>
                                     <ObjectPageSubSection titleUppercase="false">
                                         <actions>
-                                            <m:Button text="Comment" press="onCommentPress"></m:Button>
+                                            <m:Button visible="true" text="Comment" press="onCommentPress"></m:Button>
                                         </actions>
                                         <blocks>
                                             <m:VBox class="mainVboxComment">
@@ -179,7 +179,7 @@
                             <ObjectPageSection titleUppercase="false" title="Attachments">
                                 <ObjectPageSubSection >
                                     <actions>
-                                        <m:Button text="UploadFile" press="onFileLoaderPressed"></m:Button>
+                                        <m:Button visible="false" text="UploadFile" press="onFileLoaderPressed"></m:Button>
                                     </actions>
                                     <blocks>
                                         <upload:UploadSet id="uploadSet" instantUpload="false" uploadEnabled="true" afterItemAdded="onAfterItemAdded" uploadCompleted="onUploadCompleted" showIcons="true" items="{path: 'oCapData>/vob_files',templateShareable: false}">

@@ -10,12 +10,17 @@ sap.ui.define(
     var yoyLineItem = {};
     var files = {};
     var oData;
+    var fileName;
+    var item;
     // var mainServiceUrl = "https://2890861ctrial-dev-mahindravob-srv.cfapps.us10-001.hana.ondemand.com";
     var mainServiceUrl = `https://3ebeb48ctrial-dev-mahindra-srv.cfapps.us10-001.hana.ondemand.com`;
     return BaseController.extend("wizard.wizardui.controller.App", {
       async onInit() {
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 500));
+        if (this.getView().getModel("context").getData().baseurl) {
+          mainServiceUrl = this.getView().getModel("context").getData().baseurl;
+        }
         try {
           if (!oData) {
             var vobid = this.getOwnerComponent().oModels.context.oData.vobid
@@ -50,7 +55,10 @@ sap.ui.define(
       },
       onBeforeRendering: async function (oEvent) {
         debugger
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 500));
+        if (this.getView().getModel("context").getData().baseurl) {
+          mainServiceUrl = this.getView().getModel("context").getData().baseurl;
+        }
         try {
           if (!this.getView().getModel("oCapData")) {
             var vobid = this.getOwnerComponent().oModels.context.oData.vobid
@@ -169,7 +177,10 @@ sap.ui.define(
       },
       onAfterRendering: async function (oEvent) {
         debugger
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 500));
+        if (this.getView().getModel("context").getData().baseurl) {
+          mainServiceUrl = this.getView().getModel("context").getData().baseurl;
+        }
         try {
 
 
@@ -607,88 +618,779 @@ sap.ui.define(
 
         this.oDefaultDialog.open();
       },
-      onAfterItemAdded: async function (oEvent) {
+      onAfterItemAddedorg: async function (oEvent) {
         debugger
-        var item = oEvent.getParameter("item");
-        var vobid = this.getView().getModel("context").getData().vobid
-        var _createEntity = function (item) {
-          var data = {
-            mediaType: item.getMediaType(),
-            fileName: item.getFileName(),
-            // size: item.getFileObject().size,
-            vob_id: vobid,
-          };
+        try {
+          var item = oEvent.getParameter("item");
+          var fileName = item.getFileName();
+          var fileType = item.getFileObject().type;
+          var vobid = this.getView().getModel("context").getData().vobid;
+          var folders = [];
+          var that = this;
 
-          var settings = {
-            url: `${mainServiceUrl}/odata/v4/my/Files`,
-            method: "POST",
-            headers: {
-              "Content-type": "application/json"
-            },
-            data: JSON.stringify(data)
-          };
 
-          return new Promise(async (resolve, reject) => {
-            await $.ajax(settings)
-              .done((results, textStatus, request) => {
-                debugger
-                resolve(results.ID);
+          function generateUniqueId() {
+            // Generate a random number and convert it to base 36 (0-9a-z)
+            const randomPart = Math.random().toString(36).substr(2, 9);
+
+            // Get the current timestamp and convert it to base 36
+            const timestampPart = Date.now().toString(36);
+
+            // Concatenate the random part and timestamp part
+            const uniqueId = randomPart + timestampPart;
+
+            return uniqueId;
+          }
+          var dialogOpen;
+          // Open dialog only if it's not already open
+
+          if (!dialogOpen) {
+            dialogOpen = true;
+
+            // Create the dialog
+            var cdialog = new sap.m.Dialog(`dialog${generateUniqueId()}`, {
+              title: "Folders",
+              contentWidth: "40%",
+              endButton: new sap.m.Button({
+                text: "Cancel",
+                press: function (oEvent) {
+                  debugger
+                  cdialog.close();
+                  // var incomplete_items = sap.ui.getCore().byId("vobscreen3::VOB_Screen3ObjectPage--fe::CustomSubSection::Attachments--11").destroyIncompleteItems();
+                  this.byId("uploadSet").destroyIncompleteItems();
+                  cdialog.destroyContent();
+                  dialogOpen = false; // Reset the flag when dialog is closed
+                },
+
+
+              }),
+              beginButton: new sap.m.Button({
+                text: "Ok",
+                press: function (oEvent) {
+                  // var currentUrl = window.location.href;
+                  // var uuidRegex = /id=([0-9a-fA-F-]+),/;
+                  // var id = currentUrl.match(uuidRegex)[1];
+                  var foldername = oEvent.getSource().getParent().mAggregations.content[1].mAggregations.items[0].mProperties.footerText;
+                  if (foldername == "Click on the folder to select path") {
+                    var oMessageBox = sap.m.MessageBox.warning("No folder selected.", {
+                      title: "Warning",
+                      onClose: function () {
+                        oMessageBox.close();
+                        debugger;
+                      }
+                    });
+                  }
+                  else {
+                    debugger
+                    var _createEntity = function (item) {
+                      var data = {
+                        mediaType: item.getMediaType(),
+                        fileName: item.getFileName(),
+                        // size: item.getFileObject().size,
+                        Folder: foldername,
+                        vob_id: vobid,
+                      };
+
+                      var settings = {
+                        url: `${mainServiceUrl}/odata/v4/my/Files`,
+                        method: "POST",
+                        headers: {
+                          "Content-type": "application/json"
+                        },
+                        data: JSON.stringify(data)
+                      };
+
+                      return new Promise(async (resolve, reject) => {
+                        await $.ajax(settings)
+                          .done((results, textStatus, request) => {
+                            debugger
+                            resolve(results.ID);
+                          })
+                          .fail((err) => {
+                            debugger
+                            reject(err);
+                          })
+                      });
+
+                    }
+
+                    _createEntity(item).then(async (id) => {
+                      debugger
+                      var url = `${mainServiceUrl}/odata/v4/my/Files(ID=${id})/content`;
+                      item.setUploadUrl(url);
+                      item.setUrl(url);
+                      item.setVisibleEdit(false);
+                      item.attachOpenPressed((oEvent) => {
+                        debugger
+                      })
+                      item.attachRemovePressed((oEvent) => {
+                        debugger
+                      })
+
+                      // await $.ajax({
+                      //   url: `${mainServiceUrl}/odata/v4/my/Files(ID=${id})`,
+                      //   method: 'PATCH',
+                      //   contentType: 'application/json',
+                      //   data: JSON.stringify({
+                      //     url: url,
+                      //     createdBy: `${new sap.ushell.services.UserInfo().getEmail()}`
+                      //   }),
+                      //   success: function (response) {
+                      //     debugger
+                      //     // oData = response.value[0]
+                      //     console.log('Success:', response);
+                      //     // var oUploadSet = that.byId("uploadSet");
+                      //     // oUploadSet.setHttpRequestMethod("PUT");
+                      //     // oUploadSet.removeAllIncompleteItems();
+                      //     // oUploadSet.getBinding("items").refresh();
+                      //     // cdialog.close();
+                      //     // cdialog.destroyContent();
+                      //     // dialogOpen = false;
+                      //     // Handle successful response here
+                      //   },
+                      //   error: function (xhr, status, error) {
+                      //     debugger
+                      //     console.error('Error:', error);
+                      //   }
+                      // })
+                      cdialog.close();
+                      cdialog.destroyContent();
+                      dialogOpen = false;
+                      var oUploadSet = item.getParent();
+                      oUploadSet.setHttpRequestMethod("PUT");
+                      oUploadSet.removeAllIncompleteItems();
+                      oUploadSet.getBinding("items").refresh();
+
+                      // var oUploadSet = this.byId("uploadSet");
+                      // oUploadSet.setHttpRequestMethod("PUT");
+                      // oUploadSet.uploadItem(item);
+
+                    }).catch((err) => {
+                      debugger
+                      console.log(err);
+                    })
+
+
+
+                    debugger
+                  }
+                }
               })
-              .fail((err) => {
-                debugger
-                reject(err);
+
+
+            });
+
+            // Add VBox for content
+            var contentVBox = new sap.m.VBox({
+              width: "100%",
+              height: "100%"
+            });
+
+            contentVBox.addStyleClass("vboxclass");
+
+            // Add PDF icon and name to an HBox for alignment
+            var pdfHBox = new sap.m.HBox();
+            // var pdfIcon = new sap.ui.core.Icon({
+            //   src: fileType,
+            //   size: "2rem", // Adjust the size as needed
+            //   marginRight: "0.5rem" // Add some space between the icon and text
+            // });
+            debugger;
+            var pdfName = new sap.m.Text({
+              text: fileName
+            });
+            // pdfIcon.addStyleClass("icon")
+            pdfName.addStyleClass("name");
+            // pdfHBox.addItem(pdfIcon);
+            // pdfHBox.addItem(pdfName);
+            contentVBox.addItem(pdfHBox);
+
+
+
+            var vb1 = new sap.m.VBox("vb1");
+            vb1.addItem(
+              new sap.ui.webc.main.Tree("tree", {
+                itemClick: async function (params) {
+                  debugger;
+                  let selectedItem = params.mParameters.item;
+                  let path = '';
+                  let currentFolder = selectedItem;
+
+                  // Traverse up the hierarchy and construct the path
+                  while (currentFolder && currentFolder.getId() !== 'tree') {
+                    // Get the icon and name of the current folder
+                    // let icon = currentFolder.getIcon();
+                    let name = currentFolder.getText();
+
+                    // Construct the path by adding the icon and name
+                    path = `${name} / ${path}`;
+
+                    // Move to the parent folder
+                    currentFolder = currentFolder.getParent();
+                  }
+
+                  // Set the footer text with the constructed path
+                  sap.ui.getCore().byId("tree").setFooterText(path);
+                },
+                footerText: "Click on the folder to select path",
+                // title: "Folders",
+                items: [
+                  new sap.ui.webc.main.TreeItem(`fold1${generateUniqueId()}`, {
+                    icon: "sap-icon://folder-full",
+                    text: "Part No",
+
+                    //=======================Vendor 1========================
+                    items: [
+                      new sap.ui.webc.main.TreeItem(`fold2${generateUniqueId()}`, {
+                        icon: "sap-icon://folder-full",
+                        text: "Vendor 1",
+                      })]
+                  })]
               })
-          });
-
-        }
-
-        _createEntity(item).then(async (id) => {
-          debugger
-          var url = `${mainServiceUrl}/odata/v4/my/Files(ID=${id})/content`;
-          item.setUploadUrl(url);
-          item.setUrl(url);
-          item.setVisibleEdit(false);
-          item.attachOpenPressed((oEvent) => {
+            )
             debugger
-          })
-          item.attachRemovePressed((oEvent) => {
+
+            cdialog.addContent(contentVBox);
+            cdialog.addContent(vb1);
+
+
+            var mail = new sap.ushell.services.UserInfo().getEmail();
+            var folders = [];
+
+            await $.ajax({
+              url: `${mainServiceUrl}/odata/v4/my/Data?$filter=Data eq '${new sap.ushell.services.UserInfo().getEmail()}'`,
+              method: 'GET',
+              success: function (response) {
+                debugger
+                folders = response.value
+                // Handle successful response here
+              },
+              error: function (xhr, status, error) {
+                debugger
+                console.error('Error:', error);
+                // Handle error here
+              }
+            });
+
             debugger
-          })
-          await $.ajax({
-            url: `${mainServiceUrl}/odata/v4/my/Files(ID=${id})`,
-            method: 'PATCH',
-            contentType: 'application/json',
-            data: JSON.stringify({
-              url: url
-            }),
-            success: function (response) {
-              debugger
-              // oData = response.value[0]
-              console.log('Success:', response);
-              // Handle successful response here
-            },
-            error: function (xhr, status, error) {
-              debugger
-              console.error('Error:', error);
+            var child = vb1.mAggregations.items[0].mAggregations.items[0].mAggregations.items[0];
+            for (let a = 0; a < folders.length; a++) {
+              child.addItem(
+                new sap.ui.webc.main.TreeItem(`fold1.3${generateUniqueId()}`, {
+                  icon: "sap-icon://folder-full",
+                  text: folders[a].id,
+                })
+              )
             }
-          })
-          var oUploadSet = this.byId("uploadSet");
-          oUploadSet.setHttpRequestMethod("PUT");
-          oUploadSet.uploadItem(item);
 
-        }).catch((err) => {
+            cdialog.open();
+
+          }
+
+          this.byId("uploadSet").getBinding("items").refresh();
+          cdialog.close();
+
+
+          var _createEntity = function (item) {
+            var data = {
+              mediaType: item.getMediaType(),
+              fileName: item.getFileName(),
+              // size: item.getFileObject().size,
+              vob_id: vobid,
+            };
+
+            var settings = {
+              url: `${mainServiceUrl}/odata/v4/my/Files`,
+              method: "POST",
+              headers: {
+                "Content-type": "application/json"
+              },
+              data: JSON.stringify(data)
+            };
+
+            return new Promise(async (resolve, reject) => {
+              await $.ajax(settings)
+                .done((results, textStatus, request) => {
+                  debugger
+                  resolve(results.ID);
+                })
+                .fail((err) => {
+                  debugger
+                  reject(err);
+                })
+            });
+
+          }
+
+          _createEntity(item).then(async (id) => {
+            debugger
+            var url = `${mainServiceUrl}/odata/v4/my/Files(ID=${id})/content`;
+            item.setUploadUrl(url);
+            item.setUrl(url);
+            item.setVisibleEdit(false);
+            item.attachOpenPressed((oEvent) => {
+              debugger
+            })
+            item.attachRemovePressed((oEvent) => {
+              debugger
+            })
+            await $.ajax({
+              url: `${mainServiceUrl}/odata/v4/my/Files(ID=${id})`,
+              method: 'PATCH',
+              contentType: 'application/json',
+              data: JSON.stringify({
+                url: url,
+                createdBy: `${new sap.ushell.services.UserInfo().getEmail()}`
+              }),
+              success: function (response) {
+                debugger
+                // oData = response.value[0]
+                console.log('Success:', response);
+                // Handle successful response here
+              },
+              error: function (xhr, status, error) {
+                debugger
+                console.error('Error:', error);
+              }
+            })
+
+            var oUploadSet = this.byId("uploadSet");
+            oUploadSet.setHttpRequestMethod("PUT");
+            oUploadSet.uploadItem(item);
+
+          }).catch((err) => {
+            debugger
+            console.log(err);
+          })
+        }
+        catch (err) {
           debugger
           console.log(err);
-        })
+        }
+
+      },
+      onAfterItemAdded: async function (oEvent) {
+        debugger
+        var test = true;
+        async function processFiles() {
+          try {
+            debugger
+            item = oEvent.getParameter("item");
+            var fileName = item.getFileName();
+            var fileType = item.getFileObject().type;
+            var vobid = this.getView().getModel("context").getData().vobid;
+            var folders = [];
+            var that = this;
+
+
+            // cdialog.close();
+
+            var _createEntity = function (item) {
+              var data = {
+                mediaType: item.getMediaType(),
+                fileName: item.getFileName(),
+                // size: item.getFileObject().size,
+                vob_id: vobid,
+              };
+
+              var settings = {
+                url: `${mainServiceUrl}/odata/v4/my/Files`,
+                method: "POST",
+                headers: {
+                  "Content-type": "application/json",
+                },
+                data: JSON.stringify(data),
+              };
+
+              return new Promise(async (resolve, reject) => {
+                await $.ajax(settings)
+                  .done((results, textStatus, request) => {
+                    debugger;
+                    resolve(results.ID);
+                  })
+                  .fail((err) => {
+                    debugger;
+                    reject(err);
+                  });
+              });
+            };
+
+            _createEntity(item)
+              .then(async (id) => {
+                debugger;
+                var url = `${mainServiceUrl}/odata/v4/my/Files(ID=${id})/content`;
+                item.setUploadUrl(url);
+                item.setUrl(url);
+                item.setVisibleEdit(false);
+                item.attachOpenPressed((oEvent) => {
+                  debugger;
+                });
+                item.attachRemovePressed(async (oEvent) => {
+                  debugger;
+                  oEvent.preventDefault()
+                  var url = oEvent.getSource().getUploadUrl()
+
+                  var fileID;
+                  // Regular expression to extract the ID
+                  var idRegex = /ID=([\w-]+)/;
+                  var match = url.match(idRegex);
+
+                  // Check if a match is found and get the ID
+                  if (match && match.length > 1) {
+                    fileID = match[1];
+                    console.log("Extracted ID:", fileID);
+                  } else {
+                    console.log("ID not found in the URL");
+                  }
+                  var settings = {
+                    url: `${mainServiceUrl}/odata/v4/my/Files(ID=${fileID})`,
+                    method: "DELETE",
+                  };
+
+                  await $.ajax(settings).done(function (response) {
+                    debugger
+                    oUploadSet.getBinding("items").refresh();
+                    console.log(response);
+                  }).fail(function (xhr, status, error) {
+                    debugger;
+                    console.log("AJAX request failed:", error);
+                    // Handle failure here
+                  });
+
+                  oUploadSet.removeItem(oEvent.getSource());
+
+                });
+                await $.ajax({
+                  url: `${mainServiceUrl}/odata/v4/my/Files(ID=${id})`,
+                  method: "PATCH",
+                  contentType: "application/json",
+                  data: JSON.stringify({
+                    url: url,
+                    createdBy: `${new sap.ushell.services.UserInfo().getEmail()}`,
+                  }),
+                  success: function (response) {
+                    debugger;
+                    // oData = response.value[0]
+                    console.log("Success:", response);
+                    // Handle successful response here
+                  },
+                  error: function (xhr, status, error) {
+                    debugger;
+                    console.error("Error:", error);
+                  },
+                });
+
+                var oUploadSet = this.byId("uploadSet");
+                oUploadSet.setHttpRequestMethod("PUT");
+                oUploadSet.uploadItem(item);
+              })
+              .catch((err) => {
+                debugger;
+                console.log(err);
+              });
+          } catch (err) {
+            debugger;
+            console.log(err);
+          }
+        }
+
+        // Call the function
+        await processFiles.bind(this)()
+          .then(() => {
+            // Proceed with subsequent operations
+            console.log("Process completed successfully");
+          })
+          .catch((error) => {
+            // Handle the error
+            console.error("An error occurred during processing:", error);
+          });
+        debugger
+
+
+        console.log("Process completed successfully");
 
       },
       onUploadCompleted: async function (oEvent) {
         debugger
 
-
         var oUploadSet = this.byId("uploadSet");
+        oUploadSet.setHttpRequestMethod("PUT");
         oUploadSet.removeAllIncompleteItems();
         oUploadSet.getBinding("items").refresh();
+
+
+        var fileName = item.getFileName();
+        var fileType = item.getFileObject().type;
+        var vobid = this.getView().getModel("context").getData().vobid;
+        var folders = [];
+        var that = this;
+
+        function generateUniqueId() {
+          // Generate a random number and convert it to base 36 (0-9a-z)
+          const randomPart = Math.random().toString(36).substr(2, 9);
+
+          // Get the current timestamp and convert it to base 36
+          const timestampPart = Date.now().toString(36);
+
+          // Concatenate the random part and timestamp part
+          const uniqueId = randomPart + timestampPart;
+
+          return uniqueId;
+        }
+
+        var dialogOpen;
+        // Open dialog only if it's not already open
+
+        if (!dialogOpen) {
+          dialogOpen = true;
+
+          // Create the dialog
+          var cdialog = new sap.m.Dialog(`dialog${generateUniqueId()}`, {
+            title: "Folders",
+            contentWidth: "40%",
+            endButton: new sap.m.Button({
+              text: "Cancel",
+              press: async function (oEvent) {
+
+                debugger
+
+                var url = item.getUploadUrl()
+                var fileID;
+                // Regular expression to extract the ID
+                var idRegex = /ID=([\w-]+)/;
+                var match = url.match(idRegex);
+
+                // Check if a match is found and get the ID
+                if (match && match.length > 1) {
+                  fileID = match[1];
+                  console.log("Extracted ID:", fileID);
+                } else {
+                  console.log("ID not found in the URL");
+                }
+                var settings = {
+                  url: `${mainServiceUrl}/odata/v4/my/Files(ID=${fileID})`,
+                  method: "DELETE",
+                };
+
+                await $.ajax(settings).done(function (response) {
+                  debugger
+                  oUploadSet.getBinding("items").refresh();
+                  console.log(response);
+                }).fail(function (xhr, status, error) {
+                  debugger;
+                  console.log("AJAX request failed:", error);
+                  // Handle failure here
+                });
+                cdialog.close();
+                // var incomplete_items = sap.ui.getCore().byId("vobscreen3::VOB_Screen3ObjectPage--fe::CustomSubSection::Attachments--11").destroyIncompleteItems();
+                // this.byId("uploadSet").destroyIncompleteItems();
+                cdialog.destroyContent();
+                // test = false;
+                dialogOpen = false; // Reset the flag when dialog is closed
+                oUploadSet.getBinding("items").refresh();
+                oUploadSet.removeItem(item);
+              },
+            }),
+            beginButton: new sap.m.Button({
+              text: "Ok",
+              press: function (oEvent) {
+                // var currentUrl = window.location.href;
+                // var uuidRegex = /id=([0-9a-fA-F-]+),/;
+                // var id = currentUrl.match(uuidRegex)[1];
+                var foldername = oEvent.getSource().getParent().mAggregations.content[1].mAggregations.items[0].mProperties.footerText;
+                if (foldername == "Click on the folder to select path") {
+                  var oMessageBox = sap.m.MessageBox.warning("No folder selected.", {
+                    title: "Warning",
+                    onClose: function () {
+                      oMessageBox.close();
+                      debugger;
+                    },
+                  });
+                } else {
+                  debugger
+                  var _createEntity = function (item) {
+                    var data = {
+
+                      Folder: foldername,
+
+                    };
+                    var url = item.getUploadUrl()
+                    var fileID;
+                    // Regular expression to extract the ID
+                    var idRegex = /ID=([\w-]+)/;
+                    var match = url.match(idRegex);
+
+                    // Check if a match is found and get the ID
+                    if (match && match.length > 1) {
+                      fileID = match[1];
+                      console.log("Extracted ID:", fileID);
+                    } else {
+                      console.log("ID not found in the URL");
+                    }
+
+                    var settings = {
+                      url: `${mainServiceUrl}/odata/v4/my/Files(ID=${fileID})`,
+                      method: "PATCH",
+                      headers: {
+                        "Content-type": "application/json",
+                      },
+                      data: JSON.stringify(data),
+                    };
+
+                    return new Promise(async (resolve, reject) => {
+                      await $.ajax(settings)
+                        .done((results, textStatus, request) => {
+                          debugger
+                          oUploadSet.getBinding("items").refresh();
+                          resolve(results.ID);
+                        })
+                        .fail((err) => {
+                          debugger
+                          reject(err);
+                        });
+                    });
+                  };
+
+                  _createEntity(item).then(async (id) => {
+                    debugger
+                    // var url = `${mainServiceUrl}/odata/v4/my/Files(ID=${id})/content`;
+                    // item.setUploadUrl(url);
+                    // item.setUrl(url);
+                    // item.setVisibleEdit(false);
+                    // item.attachOpenPressed((oEvent) => {
+                    //   debugger;
+                    // });
+                    // item.attachRemovePressed((oEvent) => {
+                    //   debugger;
+                    // });
+
+                    cdialog.close();
+                    cdialog.destroyContent();
+                    dialogOpen = false;
+                    // var oUploadSet = item.getParent();
+                    // oUploadSet.setHttpRequestMethod("PUT");
+                    // oUploadSet.removeAllIncompleteItems();
+                    // oUploadSet.getBinding("items").refresh();
+                  }).catch((err) => {
+                    debugger;
+                    console.log(err);
+                  });
+
+                  debugger;
+                }
+                oUploadSet.getBinding("items").refresh();
+                // test = false;
+              },
+            }),
+          });
+
+          // Add VBox for content
+          var contentVBox = new sap.m.VBox({
+            width: "100%",
+            height: "100%",
+          });
+
+          contentVBox.addStyleClass("vboxclass");
+
+          // Add PDF icon and name to an HBox for alignment
+          var pdfHBox = new sap.m.HBox();
+          // var pdfIcon = new sap.ui.core.Icon({
+          //   src: fileType,
+          //   size: "2rem", // Adjust the size as needed
+          //   marginRight: "0.5rem" // Add some space between the icon and text
+          // });
+          debugger;
+          var pdfName = new sap.m.Text({
+            text: fileName,
+          });
+          // pdfIcon.addStyleClass("icon")
+          pdfName.addStyleClass("name");
+          // pdfHBox.addItem(pdfIcon);
+          // pdfHBox.addItem(pdfName);
+          contentVBox.addItem(pdfHBox);
+
+          var vb1 = new sap.m.VBox("vb1");
+          vb1.addItem(
+            new sap.ui.webc.main.Tree("tree", {
+              itemClick: async function (params) {
+                debugger;
+                let selectedItem = params.mParameters.item;
+                let path = "";
+                let currentFolder = selectedItem;
+
+                // Traverse up the hierarchy and construct the path
+                while (currentFolder && currentFolder.getId() !== "tree") {
+                  // Get the icon and name of the current folder
+                  // let icon = currentFolder.getIcon();
+                  let name = currentFolder.getText();
+
+                  // Construct the path by adding the icon and name
+                  path = `${name} / ${path}`;
+
+                  // Move to the parent folder
+                  currentFolder = currentFolder.getParent();
+                }
+
+                // Set the footer text with the constructed path
+                sap.ui.getCore().byId("tree").setFooterText(path);
+              },
+              footerText: "Click on the folder to select path",
+              // title: "Folders",
+              items: [
+                new sap.ui.webc.main.TreeItem(`fold1${generateUniqueId()}`, {
+                  icon: "sap-icon://folder-full",
+                  text: "Part No",
+
+                  //=======================Vendor 1========================
+                  items: [
+                    new sap.ui.webc.main.TreeItem(`fold2${generateUniqueId()}`, {
+                      icon: "sap-icon://folder-full",
+                      text: "Vendor 1",
+                    }),
+                  ],
+                }),
+              ],
+            })
+          );
+          debugger;
+
+          cdialog.addContent(contentVBox);
+          cdialog.addContent(vb1);
+
+          var mail = new sap.ushell.services.UserInfo().getEmail();
+          var folders = [];
+
+          await $.ajax({
+            url: `${mainServiceUrl}/odata/v4/my/Data?$filter=Data eq '${new sap.ushell.services.UserInfo().getEmail()}'`,
+            method: "GET",
+            success: function (response) {
+              debugger;
+              folders = response.value;
+              // Handle successful response here
+            },
+            error: function (xhr, status, error) {
+              debugger;
+              console.error("Error:", error);
+              // Handle error here
+            },
+          });
+
+          debugger;
+          var child = vb1.mAggregations.items[0].mAggregations.items[0].mAggregations.items[0];
+          for (let a = 0; a < folders.length; a++) {
+            child.addItem(
+              new sap.ui.webc.main.TreeItem(`fold1.3${generateUniqueId()}`, {
+                icon: "sap-icon://folder-full",
+                text: folders[a].id,
+              })
+            );
+          }
+
+          cdialog.open();
+        }
+
+        this.byId("uploadSet").getBinding("items").refresh();
+
       },
       onRemovePressed: async function (oEvent) {
         debugger
